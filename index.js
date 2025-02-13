@@ -2,7 +2,15 @@ const { initializeDatabase } = require("./db/db.connect")
 const fs = require("fs")
 const Book = require("./models/book.models")
 const express = require("express")
-const { error } = require("console")
+const cors = require("cors")
+
+const corsOptions = {
+    origin: "*",
+    Credentials: true
+}
+
+app.use(cors())
+
 initializeDatabase()
 
 const app = express()
@@ -92,6 +100,28 @@ app.get("/books", async (req, res) => {
         }
     } catch(error){
         res.status(500).json({error: "Faild to get books"})
+    }
+})
+
+async function getBookById(bookId){
+    try{
+        const book = await Book.findById(bookId)
+        return book
+    } catch(error){
+        throw(error)
+    }
+}
+
+app.get("/books/bookById/:bookId", async (req, res) => {
+    try{
+       const bookById= await getBookById(req.params.bookId)
+       if(bookById){
+        res.status(200).json({message: "book found.", books: bookById})
+       }else {
+        res.status(404).json({error: "Book not found."})
+       }
+    } catch(error){
+        res.status(500).json({error: error.message})
     }
 })
 
@@ -249,7 +279,7 @@ app.delete("/books/deleteBook/:bookId", async (req, res) => {
     }
 })
 
-const PORT = 3000
+const PORT = 5000
 app.listen(PORT, () => {
     console.log("Server is running on port", PORT)
 })
