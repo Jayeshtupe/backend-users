@@ -3,18 +3,17 @@ const fs = require("fs")
 const Book = require("./models/book.models")
 const express = require("express")
 const cors = require("cors")
-
 const corsOptions = {
     origin: "*",
-    Credentials: true
+    credentials: true
 }
-
-app.use(cors())
 
 initializeDatabase()
 
 const app = express()
+app.use(cors(corsOptions))
 app.use(express.json())
+
 
 async function seedBookData() {
     const jsonData = fs.readFileSync("book.json", "utf8")
